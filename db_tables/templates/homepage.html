@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link href="{% static 'css/jquery.dataTables.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/spin.css' %}" rel="stylesheet">
+<div>
+    Filter: <input type="text" id="query_params">
+    <button type="submit" id="filter_btn">Submit</button>
+</div>
+<table id="user_table" class="display table table-responsive" style="width:100%">
+    <thead id="table_header">
+        <tr>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Gender</th>
+            <th>Age</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>State</th>
+            <th>City</th>
+            <th>Created At</th>
+            <th>User Code</th>
+        </tr>
+    </thead>
+    <tbody id="user_list">
+
+    </tbody>
+    
+</table>
+<script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    var table = null;
+    $.create_table = function(filter){
+        $("#user_table").hide()
+        api_url = "{% url 'users' %}";
+        if(filter){
+            api_url += "?" + filter
+        }
+        $.get(api_url, function( data ) {
+            data.forEach(element => {
+                var dom = "<tr>";
+                dom += "<td>" + element.name + "</td>";
+                dom += "<td>" + element.surname + "</td>";
+                dom += "<td>" + element.gender + "</td>";
+                dom += "<td>" + element.age + "</td>";
+                dom += "<td>" + element.email + "</td>";
+                dom += "<td>" + element.phone + "</td>";
+                dom += "<td>" + element.state + "</td>";
+                dom += "<td>" + element.city + "</td>";
+                dom += "<td>" + element.created_at + "</td>";
+                dom += "<td>" + element.user_code + "</td>";
+                dom += "</tr>"
+                $("#user_list").append(dom)
+            });
+            table = $('#user_table').DataTable();
+            $("#user_table").show()
+        });
+    }
+    $.create_table(null);
+    $("#filter_btn").on("click", function(){
+        $("#user_table").hide();
+        $("#user_list").empty();
+        table.clear();
+        table.destroy();
+        
+        var query_params = $("#query_params").val();
+        if(query_params != null || query_params != ""){
+            $.create_table(query_params);
+        }
+        else{
+            $.create_table();
+        }
+        
+    })
+    
+} );
+</script>
+{% endblock %}
